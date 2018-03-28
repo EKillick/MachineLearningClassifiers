@@ -22,9 +22,19 @@ public class LinearPerceptron implements Classifier{
      * Default constructor for a LinearPerceptron Classifier
      */
     public LinearPerceptron(){
-        this.learningRate = 1.0; // defaults to learning rate of 0
+        this.learningRate = 1.0; // defaults to learning rate of 1.0
+        this.stoppingIterations = 100; // default value of 100 iterations
     }
     
+    /**
+     * Constructor to allow setting of learning rate and stopping iterations 
+     * @param l learningRate as a double
+     * @param s stoppingIterations as an int
+     */
+    public LinearPerceptron(double l, int s){
+        this.learningRate = l;
+        this.stoppingIterations = s;
+    }
     
     //Accessor Methods
     /**
@@ -41,6 +51,22 @@ public class LinearPerceptron implements Classifier{
      */
     public double getLearningRate(){
         return this.learningRate;
+    }
+    
+    /**
+     * Sets the number of iterations before stopping
+     * @param s - stopping conditions as an int
+     */
+    public void setStoppingIterations(int s){
+        this.stoppingIterations = s;
+    }
+    
+    /**
+     * Returns the number of iterations before stopping
+     * @return stopping iterations as an int
+     */
+    public int getStoppingIterations(){
+        return this.stoppingIterations;
     }
 
     @Override
