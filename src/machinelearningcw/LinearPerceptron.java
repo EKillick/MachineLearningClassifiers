@@ -1,5 +1,6 @@
 package machinelearningcw;
 
+import java.util.Arrays;
 import weka.classifiers.Classifier;
 import weka.core.Capabilities;
 import weka.core.Instance;
@@ -69,14 +70,41 @@ public class LinearPerceptron implements Classifier{
         return this.stoppingIterations;
     }
 
+    /**
+     * Builds classifier from given Instance
+     * @param i of type Instance
+     * @throws Exception 
+     */
     @Override
     public void buildClassifier(Instances i) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+        weights = new double[i.numAttributes() - 1]; // creates weights array
+        Arrays.fill(weights, 1); // initialises weights to 1
+        System.out.println(i.numAttributes());
+        
+        //
     }
 
+    /**
+     * Classifies a single instance
+     * @param instnc instance to classify
+     * @return 0 or 1
+     * @throws Exception 
+     */
     @Override
     public double classifyInstance(Instance instnc) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+       double result = 0;
+       
+       // multiply values and weights
+       for (int i = 0; i < instnc.numAttributes() - 1; i++){
+           result = (weights[i] * instnc.value(i));
+       }
+       
+       if (result > 0){
+           return 1;
+       }
+       else{
+           return 0;
+       }
     }
 
     @Override
