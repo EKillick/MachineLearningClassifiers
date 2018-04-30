@@ -72,16 +72,49 @@ public class LinearPerceptron implements Classifier{
 
     /**
      * Builds classifier from given Instance
+     * @param instances
      * @param i of type Instance
      * @throws Exception 
      */
     @Override
-    public void buildClassifier(Instances i) throws Exception {
-        weights = new double[i.numAttributes() - 1]; // creates weights array
+    public void buildClassifier(Instances instances) throws Exception {
+        weights = new double[instances.numAttributes() - 1]; // creates weights array
         Arrays.fill(weights, 1); // initialises weights to 1
-        System.out.println(i.numAttributes());
+//        System.out.println(instances.numAttributes());
         
-        //
+        //need to calculate accuracy?
+        
+        //calculates y for each instance
+        instances.forEach((Instance instance) -> {
+            double y = 0;
+            for (int i = 0; i < instances.numAttributes() - 1; i++){
+                y += (weights[i] * instance.value(i));
+            }
+            
+            System.out.println("y:" +y);
+            
+            double calculated;
+            double actual = instance.classValue();
+            
+            if (y > 0){
+                calculated = 1.0;    
+            }
+            else{
+                calculated = 0.0;
+            }
+            
+            double classDiff = actual - calculated;
+            System.out.println("actual: " + actual + " calculated: " + calculated + " diff: " + classDiff);
+            
+            //update the weights
+            for (int j = 0; j < instances.numAttributes() - 1; j++){
+                weights[j] += (0.5 * learningRate * classDiff * instance.value(j));
+                System.out.println("Weight " + j + ": "+ weights[j] + " value: " + instance.value(j));
+            }
+            System.out.println("\n");
+            
+            
+        });
     }
 
     /**
@@ -100,10 +133,10 @@ public class LinearPerceptron implements Classifier{
        }
        
        if (result > 0){
-           return 1;
+           return 1.0;
        }
        else{
-           return 0;
+           return 0.0;
        }
     }
 
