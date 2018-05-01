@@ -82,30 +82,31 @@ public class LinearPerceptron extends AbstractClassifier{
         Arrays.fill(weights, 1); // initialises weights to 1
         
         int iterationCount = 0;
+        int correctCount = 0;
         
         do{
             for (int i = 0; i < instances.numInstances(); i++){
                 Instance instance = instances.get(i);
-                double y = 0;
-
                 double calculated = classifyInstance(instance);
-
                 double actual = instance.classValue();
-
                 double classDiff = actual - calculated;
-                System.out.println("actual: " + actual + " calculated: " + calculated + " diff: " + classDiff);
+                
+                if (classDiff == 0.0){
+                    correctCount++;
+                } 
+                else{
+                    correctCount = 0;
+                }
 
                 //update the weights
                 for (int j = 0; j < instances.numAttributes() - 1; j++){
                     weights[j] += (learningRate * classDiff * instance.value(j));
-                    System.out.println("Weight " + j + ": "+ weights[j] + " value: " + instance.value(j));
                 }
                 System.out.println("\n");
                 
                 iterationCount++;
-
             }
-        }while(iterationCount < stoppingIterations);
+        }while(iterationCount < stoppingIterations && correctCount < instances.numInstances());
     }
 
     /**
