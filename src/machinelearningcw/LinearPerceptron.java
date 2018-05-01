@@ -1,7 +1,7 @@
 package machinelearningcw;
 
 import java.util.Arrays;
-import weka.classifiers.Classifier;
+import weka.classifiers.AbstractClassifier;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -11,7 +11,7 @@ import weka.core.Instances;
  * that implements the Weka Classifier class
  * @author 6277497
  */
-public class LinearPerceptron implements Classifier{
+public class LinearPerceptron extends AbstractClassifier{
     
     private int stoppingIterations;
     private double weights[];
@@ -80,41 +80,32 @@ public class LinearPerceptron implements Classifier{
     public void buildClassifier(Instances instances) throws Exception {
         weights = new double[instances.numAttributes() - 1]; // creates weights array
         Arrays.fill(weights, 1); // initialises weights to 1
-//        System.out.println(instances.numAttributes());
         
-        //need to calculate accuracy?
+        int iterationCount = 0;
         
-        //calculates y for each instance
-        instances.forEach((Instance instance) -> {
-            double y = 0;
-            for (int i = 0; i < instances.numAttributes() - 1; i++){
-                y += (weights[i] * instance.value(i));
+        do{
+            for (int i = 0; i < instances.numInstances(); i++){
+                Instance instance = instances.get(i);
+                double y = 0;
+
+                double calculated = classifyInstance(instance);
+
+                double actual = instance.classValue();
+
+                double classDiff = actual - calculated;
+                System.out.println("actual: " + actual + " calculated: " + calculated + " diff: " + classDiff);
+
+                //update the weights
+                for (int j = 0; j < instances.numAttributes() - 1; j++){
+                    weights[j] += (learningRate * classDiff * instance.value(j));
+                    System.out.println("Weight " + j + ": "+ weights[j] + " value: " + instance.value(j));
+                }
+                System.out.println("\n");
+                
+                iterationCount++;
+
             }
-            
-            System.out.println("y:" +y);
-            
-            double calculated;
-            double actual = instance.classValue();
-            
-            if (y > 0){
-                calculated = 1.0;    
-            }
-            else{
-                calculated = 0.0;
-            }
-            
-            double classDiff = actual - calculated;
-            System.out.println("actual: " + actual + " calculated: " + calculated + " diff: " + classDiff);
-            
-            //update the weights
-            for (int j = 0; j < instances.numAttributes() - 1; j++){
-                weights[j] += (0.5 * learningRate * classDiff * instance.value(j));
-                System.out.println("Weight " + j + ": "+ weights[j] + " value: " + instance.value(j));
-            }
-            System.out.println("\n");
-            
-            
-        });
+        }while(iterationCount < stoppingIterations);
     }
 
     /**
@@ -129,7 +120,7 @@ public class LinearPerceptron implements Classifier{
        
        // multiply values and weights
        for (int i = 0; i < instnc.numAttributes() - 1; i++){
-           result = (weights[i] * instnc.value(i));
+           result += (weights[i] * instnc.value(i));
        }
        
        if (result > 0){
@@ -139,15 +130,4 @@ public class LinearPerceptron implements Classifier{
            return 0.0;
        }
     }
-
-    @Override
-    public double[] distributionForInstance(Instance instnc) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Capabilities getCapabilities() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
 }
