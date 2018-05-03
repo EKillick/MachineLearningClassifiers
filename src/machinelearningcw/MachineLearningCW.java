@@ -2,10 +2,7 @@ package machinelearningcw;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import weka.core.Instances;
-import weka.classifiers.Classifier;
-
 /**
  *
  * @author EKillick
@@ -19,12 +16,13 @@ public class MachineLearningCW {
         String testLocation = "test_data.arff";
         Instances testInstance = loadData(testLocation);
         testInstance.setClassIndex(testInstance.numAttributes() - 1);
-        LinearPerceptron classTest = new LinearPerceptron();
+        EnhancedLinearPerceptron classTest = new EnhancedLinearPerceptron(true, true);
+//        LinearPerceptron classTest = new LinearPerceptron();
         try{
             classTest.buildClassifier(testInstance);
         }
         catch(Exception error){
-            System.err.print(error);
+            error.printStackTrace(System.err);
         }
     }
     
