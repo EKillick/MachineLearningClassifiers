@@ -2,7 +2,6 @@ package machinelearningcw;
 
 import java.util.Arrays;
 import weka.classifiers.AbstractClassifier;
-import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -16,6 +15,7 @@ public class LinearPerceptron extends AbstractClassifier{
     private int stoppingIterations;
     private double weights[];
     private double learningRate;
+    private double bias;
     
     //Constructors
     
@@ -25,6 +25,7 @@ public class LinearPerceptron extends AbstractClassifier{
     public LinearPerceptron(){
         this.learningRate = 1.0; // defaults to learning rate of 1.0
         this.stoppingIterations = 100; // default value of 100 iterations
+        this.bias = 0.0;
     }
     
     /**
@@ -32,9 +33,10 @@ public class LinearPerceptron extends AbstractClassifier{
      * @param l learningRate as a double
      * @param s stoppingIterations as an int
      */
-    public LinearPerceptron(double l, int s){
+    public LinearPerceptron(double l, int s, double b){
         this.learningRate = l;
         this.stoppingIterations = s;
+        this.bias = b;
     }
     
     //Accessor Methods
@@ -78,11 +80,19 @@ public class LinearPerceptron extends AbstractClassifier{
      */
     @Override
     public void buildClassifier(Instances instances) throws Exception {
-        weights = new double[instances.numAttributes() - 1]; // creates weights array
+        int nonClassAttributes = (instances.numAttributes() - 1);
+        weights = new double[nonClassAttributes]; // creates weights array
         Arrays.fill(weights, 1); // initialises weights to 1
         
         int iterationCount = 0;
         int correctCount = 0;
+        
+        //Check values are real
+        for(int att = 0; att < instances.numAttributes()-1; att++){
+            if(!instances.attribute(att).isNumeric()){
+                throw new Exception("Non Real Values");
+            }
+        }
         
         do{
             for (int i = 0; i < instances.numInstances(); i++){
@@ -95,15 +105,12 @@ public class LinearPerceptron extends AbstractClassifier{
                     correctCount++;
                 } 
                 else{
-                    correctCount = 0;
+                        correctCount = 0;
+                        //update the weights
+                        for (int j = 0; j < nonClassAttributes; j++){
+                        weights[j] += (learningRate * classDiff * instance.value(j));
+                    }
                 }
-
-                //update the weights
-                for (int j = 0; j < instances.numAttributes() - 1; j++){
-                    weights[j] += (learningRate * classDiff * instance.value(j));
-                }
-                System.out.println("\n");
-                
                 iterationCount++;
             }
         }while(iterationCount < stoppingIterations && correctCount < instances.numInstances());
@@ -119,16 +126,17 @@ public class LinearPerceptron extends AbstractClassifier{
     public double classifyInstance(Instance instnc) throws Exception {
        double result = 0;
        
-       // multiply values and weights
-       for (int i = 0; i < instnc.numAttributes() - 1; i++){
-           result += (weights[i] * instnc.value(i));
-       }
-       
-       if (result > 0){
-           return 1.0;
-       }
-       else{
-           return 0.0;
-       }
+        // multiply values and weights
+        for (int i = 0; i < instnc.numAttributes() - 1; i++){
+            result += (weights[i] * instnc.value(i));
+        }
+        result += bias;
+
+        if (result > 0){
+            return 1.0;
+        }
+        else{
+            return 0.0;
+        }
     }
 }
