@@ -1,7 +1,6 @@
 package machinelearningcw;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Random;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
@@ -281,7 +280,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
                 else{
                     value = instnc.value(i);
             }
-            result += (weights[i] * value);
+            result += (weights[i] * value); //breaks when i is 3
        }
        result += bias;
        
