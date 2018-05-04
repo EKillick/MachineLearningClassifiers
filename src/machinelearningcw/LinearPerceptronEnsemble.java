@@ -8,6 +8,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import java.util.Random;
 import java.util.Set;
+import weka.core.DenseInstance;
 
 /**
  * An ensemble of EnhancedLinearPerceptron classifiers
@@ -18,13 +19,16 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
     private EnhancedLinearPerceptron[] arrayEnsemble;
     private double attributesPercent;
     private double instancesPercent;
-    private int[][] instAttPair;
+    private int[][] classAttPair;
+    double[] groupResult = new double[2];
+    int subsetAttributes;
+    int subsetInstances;
     
     /**
      * Default constructor for a LinearPerceptronEnsemble
      */
     public LinearPerceptronEnsemble(){
-        ensembleSize = 50;
+        ensembleSize = 5;
         arrayEnsemble = new EnhancedLinearPerceptron[ensembleSize];
         attributesPercent = 50;
         instancesPercent = 50;
@@ -39,15 +43,18 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
     public void buildClassifier(Instances i) throws Exception {
         int instAttributes = (i.numAttributes() - 1);
         int instanceCount = i.numInstances();
-        int subsetAttributes = (int) Math.round((attributesPercent/100) * instAttributes);
-        int subsetInstances = (int) Math.round((instancesPercent/100) * instanceCount);
+        
+        //Number of attributes and instances to keep
+        subsetAttributes = (int) Math.round((attributesPercent/100) * instAttributes);
+        subsetInstances = (int) Math.round((instancesPercent/100) * instanceCount);
+        
         List<Integer> deletedAttributes;
+        
         Random rand = new Random();
 //        System.out.println(attributesPercent/100);
 //        System.out.println(numberOfAttributes);
 
-        instAttPair = new int[ensembleSize][];  
-        ensembleSize = 10;
+        classAttPair = new int[ensembleSize][];  
         //For each classifier
         for (int c = 0; c < ensembleSize; c++){
             // reset copy of instances
@@ -69,25 +76,70 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
                 deletedAttributes.add(attributeToDel);
             }
             Collections.sort(deletedAttributes, Collections.reverseOrder());
-            instAttPair[c] = deletedAttributes.stream().mapToInt(a -> a).toArray();
+            classAttPair[c] = deletedAttributes.stream().mapToInt(a -> a).toArray();
             
             //Delete attributes
             for (int count = 0; count < subsetAttributes; count++){
-                subset.deleteAttributeAt(instAttPair[c][count]);
+                subset.deleteAttributeAt(classAttPair[c][count]);
             }
-            System.out.println(subset.toString());
+            
+            //Store classifiers in array
+            EnhancedLinearPerceptron classifier = new EnhancedLinearPerceptron(false, false);
+            classifier.buildClassifier(subset);
+            arrayEnsemble[c] = classifier;   
+        }        
+                    
+        for (int inst = 0; inst < i.numInstances(); inst++){
+            Instance instance = i.get(inst);
+            for (int c = 0; c < ensembleSize; c++){
+                distributionForInstance(instance);
+            }
             
         }
     }
 
+    /**
+     * 
+     * @param instnc
+     * @return
+     * @throws Exception 
+     */
     @Override
     public double classifyInstance(Instance instnc) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (groupResult[0] > groupResult[1]){
+            return 0.0;
+        }
+        else{
+            return 1.0;
+        }
     }
 
     @Override
     public double[] distributionForInstance(Instance instnc) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //For each classifier
+        double result;
+        int zeroCount = 0;
+        int oneCount = 0;
+        for (int i = 0; i < arrayEnsemble.length; i++){
+            DenseInstance instCopy = new DenseInstance(instnc); //reset instance
+            //For each attribute to delete
+            for (int j = 0; j < classAttPair[i].length; j++){
+                instCopy.deleteAttributeAt(classAttPair[i][j]);
+            }
+            
+            result = arrayEnsemble[i].classifyInstance(instCopy);
+            
+            if (result == 0.0){
+                zeroCount++;
+            }
+            else{
+                oneCount++;
+            }
+        }
+        groupResult[0] = zeroCount;
+        groupResult[1] = oneCount;
+        
+        return groupResult;
     }
     
 }
