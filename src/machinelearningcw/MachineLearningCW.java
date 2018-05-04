@@ -13,11 +13,13 @@ public class MachineLearningCW {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String testLocation = "test_data.arff";
+        String testLocation = "datasets/pittsburg-bridges-T-OR-D.arff";
+//        String testLocation = "test_data.arff";
         Instances testInstance = loadData(testLocation);
         testInstance.setClassIndex(testInstance.numAttributes() - 1);
-        EnhancedLinearPerceptron classTest = new EnhancedLinearPerceptron(true, true);
+//        EnhancedLinearPerceptron classTest = new EnhancedLinearPerceptron(true, true);
 //        LinearPerceptron classTest = new LinearPerceptron();
+        LinearPerceptronEnsemble classTest = new LinearPerceptronEnsemble();
         try{
             classTest.buildClassifier(testInstance);
         }
