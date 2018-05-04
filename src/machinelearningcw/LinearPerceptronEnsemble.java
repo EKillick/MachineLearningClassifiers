@@ -2,14 +2,12 @@ package machinelearningcw;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.IntStream;
-import weka.filters.Filter;
 
 /**
  * An ensemble of EnhancedLinearPerceptron classifiers
@@ -20,6 +18,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
     private EnhancedLinearPerceptron[] arrayEnsemble;
     private double attributesPercent;
     private double instancesPercent;
+    private int[][] instAttPair;
     
     /**
      * Default constructor for a LinearPerceptronEnsemble
@@ -40,37 +39,43 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
     public void buildClassifier(Instances i) throws Exception {
         int instAttributes = (i.numAttributes() - 1);
         int instanceCount = i.numInstances();
-        int numberOfAttributes = (int) Math.round((attributesPercent/100) * instAttributes);
-        int numberOfInstances = (int) Math.round((instancesPercent/100) * instanceCount);
+        int subsetAttributes = (int) Math.round((attributesPercent/100) * instAttributes);
+        int subsetInstances = (int) Math.round((instancesPercent/100) * instanceCount);
+        List<Integer> deletedAttributes;
         Random rand = new Random();
-        System.out.println(attributesPercent/100);
-        System.out.println(numberOfAttributes);
-        
+//        System.out.println(attributesPercent/100);
+//        System.out.println(numberOfAttributes);
+
+        instAttPair = new int[ensembleSize][];  
+        ensembleSize = 10;
+        //For each classifier
         for (int c = 0; c < ensembleSize; c++){
             // reset copy of instances
             Instances instancesCopy = new Instances(i);
             Collections.shuffle(instancesCopy);
             
             //Create subset of the instance
-            Instances subset = new Instances(instancesCopy, 0, numberOfInstances);
+            Instances subset = new Instances(instancesCopy, 0, subsetInstances);
             
-            Set deletedAttributes = new HashSet();
+            deletedAttributes = new ArrayList();
+            int attributeToDel;
             
-            for (int count = 0; count < numberOfAttributes; count++){
-                int attributeToDel;
+            //Select attributes to delete
+            for (int count = 0; count < subsetAttributes; count++){
                 do{
-                    attributeToDel = rand.nextInt(instAttributes + 1);
+                    attributeToDel = rand.nextInt(instAttributes);
                 }
                 while(deletedAttributes.contains(attributeToDel));
                 deletedAttributes.add(attributeToDel);
-                System.out.println(deletedAttributes);
-
             }
+            Collections.sort(deletedAttributes, Collections.reverseOrder());
+            instAttPair[c] = deletedAttributes.stream().mapToInt(a -> a).toArray();
             
-            for (int att = 0; att < numberOfAttributes; att++){
-//                System.out.println(rand.nextInt(instAttributes));
+            //Delete attributes
+            for (int count = 0; count < subsetAttributes; count++){
+                subset.deleteAttributeAt(instAttPair[c][count]);
             }
-//            arrayEnsemble[c] = new EnhancedLinearPerceptron(trimInstances);
+            System.out.println(subset.toString());
             
         }
     }
