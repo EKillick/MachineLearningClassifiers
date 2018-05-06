@@ -51,6 +51,14 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
     }
     
     /**
+     * Constructor with default value that allows choice of learning algorithm
+     * @param useOnline 
+     */
+    public EnhancedLinearPerceptron(boolean useOnline){
+        this(1, 100, true, false, 0, useOnline);
+    }
+    
+    /**
      * Constructor to allow setting of learning rate and stopping iterations 
      * @param l learningRate as a double
      * @param s stoppingIterations as an int
@@ -102,12 +110,35 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
     }
     
     /**
+     * @return the standardisation
+     */
+    public boolean isStandardisation() {
+        return standardisation;
+    }
+
+    /**
+     * @param standardisation the standardisation to set
+     */
+    public void setStandardisation(boolean standardisation) {
+        this.standardisation = standardisation;
+    }
+    
+    /**
      * Builds classifier from given Instance
      * @param instances
      * @throws Exception 
      */
     @Override
     public void buildClassifier(Instances instances) throws Exception {
+        int folds;
+        
+        if (instances.numInstances() < 10){
+            folds = instances.numInstances();
+        }
+        else{
+            folds = 10;
+        }
+        
         int nonClassAttributes = (instances.numAttributes() - 1);
         attributeMeans = new double[nonClassAttributes];
         attributeStdDev = new double[nonClassAttributes];
@@ -120,12 +151,12 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
             EnhancedLinearPerceptron offClassifier = new EnhancedLinearPerceptron();
             offClassifier.useOnline = false;
             offClassifier.buildClassifier(instances);
-            evalOffline.crossValidateModel(offClassifier, instances, 5, new Random());
+            evalOffline.crossValidateModel(offClassifier, instances, folds, new Random());
             
             Evaluation evalOnline = new Evaluation(instances);
             EnhancedLinearPerceptron onClassifier = new EnhancedLinearPerceptron();
             onClassifier.buildClassifier(instances);
-            evalOnline.crossValidateModel(onClassifier, instances, 5, new Random());    
+            evalOnline.crossValidateModel(onClassifier, instances, folds, new Random());    
             
 //            System.out.println("Offline Error: " + evalOffline.errorRate());
 //            System.out.println("Online Error: " + evalOnline.errorRate());
@@ -183,7 +214,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
                 
                 //update the weights
                 for (int j = 0; j < nonClassAttributes; j++){
-                    if (standardisation){
+                    if (isStandardisation()){
                     value = standardiseValue(instance.value(j), 
                                         attributeMeans[j], attributeStdDev[j]);
                     }
@@ -242,7 +273,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
                 
                 //update the weights
                 for (int j = 0; j < nonClassAttributes; j++){
-                    if (standardisation){
+                    if (isStandardisation()){
                     value = standardiseValue(instance.value(j), 
                                         attributeMeans[j], attributeStdDev[j]);
                     }
@@ -273,7 +304,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
        
          // multiply values and weights
         for (int i = 0; i < instnc.numAttributes() - 1; i++){
-            if (standardisation){
+            if (isStandardisation()){
                 value = standardiseValue(instnc.value(i), 
                                      attributeMeans[i], attributeStdDev[i]);
                 }
