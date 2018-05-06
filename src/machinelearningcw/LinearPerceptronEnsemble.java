@@ -7,7 +7,6 @@ import weka.classifiers.AbstractClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
 import java.util.Random;
-import java.util.Set;
 import weka.core.DenseInstance;
 
 /**
@@ -15,12 +14,11 @@ import weka.core.DenseInstance;
  * @author EKillick
  */
 public class LinearPerceptronEnsemble extends AbstractClassifier {
-    private int ensembleSize;
-    private EnhancedLinearPerceptron[] arrayEnsemble;
-    private double attributesPercent;
-    private double instancesPercent;
+    private final int ensembleSize;
+    private final EnhancedLinearPerceptron[] arrayEnsemble;
+    private final double attributesPercent;
+    private final double instancesPercent;
     private int[][] classAttPair;
-    double[] groupResult = new double[2];
     int subsetAttributes;
     int subsetInstances;
     
@@ -28,7 +26,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
      * Default constructor for a LinearPerceptronEnsemble
      */
     public LinearPerceptronEnsemble(){
-        ensembleSize = 5;
+        ensembleSize = 50;
         arrayEnsemble = new EnhancedLinearPerceptron[ensembleSize];
         attributesPercent = 50;
         instancesPercent = 50;
@@ -91,11 +89,9 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
                     
         for (int inst = 0; inst < i.numInstances(); inst++){
             Instance instance = i.get(inst);
-            for (int c = 0; c < ensembleSize; c++){
-                distributionForInstance(instance);
-            }
-            
+            distributionForInstance(instance);
         }
+//            System.out.println(inst + " " + classifyInstance(instance)); 
     }
 
     /**
@@ -106,7 +102,8 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
      */
     @Override
     public double classifyInstance(Instance instnc) throws Exception {
-        if (groupResult[0] > groupResult[1]){
+        double[] distForInst = distributionForInstance(instnc);
+        if (distForInst[0] > distForInst[1]){
             return 0.0;
         }
         else{
@@ -120,6 +117,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
         double result;
         int zeroCount = 0;
         int oneCount = 0;
+        double[] groupResult = new double[2];
         for (int i = 0; i < arrayEnsemble.length; i++){
             DenseInstance instCopy = new DenseInstance(instnc); //reset instance
             //For each attribute to delete
@@ -138,7 +136,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
         }
         groupResult[0] = zeroCount;
         groupResult[1] = oneCount;
-        
+        System.out.println(groupResult[0] + " " + groupResult[1]);
         return groupResult;
     }
     
