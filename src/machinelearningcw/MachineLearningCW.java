@@ -1,8 +1,10 @@
 package machinelearningcw;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +23,7 @@ public class MachineLearningCW {
     private static int refactorCount = 10;
     private static double[][] confusionMatrix;
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException{
         ArrayList<Classifier> classifierArray = new ArrayList<>();
         String[] labels = new String[7];
         
@@ -55,6 +57,16 @@ public class MachineLearningCW {
         labels[6] = "Weka Voted Perceptron";
         
         File dir = new File("datasets");
+        PrintWriter output = new PrintWriter(new File("results.csv"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("Dataset,");
+        sb.append("Classifier,");
+        sb.append("TP,");
+        sb.append("FP,");
+        sb.append("FN,");
+        sb.append("TN,");
+        sb.append("\n");
+        
         String[] fileNames = dir.list();        
         for (String f : fileNames) {
             System.out.println(f);
@@ -90,17 +102,25 @@ public class MachineLearningCW {
                         error.printStackTrace(System.err);
                     }
                 }
+                sb.append(labels[i]).append(",");
+                sb.append(f).append(",");
                 for(int rows = 0; rows < confusionMatrix.length; rows++){
                     for(int cols = 0; cols < confusionMatrix.length; cols++){
                         confusionMatrix[rows][cols] /= refactorCount;
+                        sb.append(confusionMatrix[rows][cols]).append(",");
                     }
                 }
+                sb.append("\n");
                 System.out.println(labels[i] + " avg after " + refactorCount 
                         + " resamples: " + Arrays.deepToString(confusionMatrix));
 
             }
+            sb.append('\n');
             System.out.println("==================================");
         }
+        output.write(sb.toString());
+        output.close();
+
     }
     
     private static Instances loadData(String location){
@@ -114,7 +134,7 @@ public class MachineLearningCW {
         }
         return returnInstance;  
     }
-    
+       
     /**
      * A method to refactor a given data set
      * @param instances
@@ -128,9 +148,6 @@ public class MachineLearningCW {
         
         Instances trainData = new Instances(instances, 0, numToSplit);
         Instances testData = new Instances(instances, numToSplit, numInstances-numToSplit);
-        
-//        System.out.println(trainData.size());
-//        System.out.println(testData.size());
 
         Instances[] testTrain = new Instances[2];
         testTrain[0] = trainData;
