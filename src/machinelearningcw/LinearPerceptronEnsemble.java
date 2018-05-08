@@ -136,7 +136,7 @@ public class LinearPerceptronEnsemble extends AbstractClassifier {
         }
         groupResult[0] = zeroCount;
         groupResult[1] = oneCount;
-        System.out.println(groupResult[0] + " " + groupResult[1]);
+//        System.out.println(groupResult[0] + " " + groupResult[1]);
         return groupResult;
     }
     
