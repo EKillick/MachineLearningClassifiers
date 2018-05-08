@@ -1,0 +1,15 @@
+@relation test_data
+
+@attribute f1 numeric
+@attribute f2 numeric
+@attribute class {0,1}
+
+@data
+6,2,0
+-2,5,1
+0,4,1
+1,-6,0
+-3,-4,0
+10,0,0
+0,-6,0
+4,-7,0
