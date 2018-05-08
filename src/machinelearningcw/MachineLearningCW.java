@@ -25,7 +25,7 @@ public class MachineLearningCW {
     
     public static void main(String[] args) throws FileNotFoundException{
         ArrayList<Classifier> classifierArray = new ArrayList<>();
-        String[] labels = new String[7];
+        String[] labels = new String[8];
         
         EnhancedLinearPerceptron offlineLinearPerceptron = new EnhancedLinearPerceptron(false);
         classifierArray.add(offlineLinearPerceptron);
@@ -43,18 +43,22 @@ public class MachineLearningCW {
         EnhancedLinearPerceptron onlineLinearStd = new EnhancedLinearPerceptron();
         classifierArray.add(onlineLinearStd);
         labels[3] = "Online Linear Perceptron (std)";
+        
+        LinearPerceptronEnsemble linearEnsemble = new LinearPerceptronEnsemble();
+        classifierArray.add(linearEnsemble);
+        labels[4] = "Linear Perceptron Ensemble";
 
         EnhancedLinearPerceptron modelSelection = new EnhancedLinearPerceptron(true, true);
         classifierArray.add(modelSelection);
-        labels[4] = "Linear Perceptron w/ Model Selection";
+        labels[5] = "Linear Perceptron w/ Model Selection";
 
         MultilayerPerceptron wekaMultilayer = new MultilayerPerceptron();
         classifierArray.add(wekaMultilayer);
-        labels[5] = "Weka Multilayer Perceptron";
+        labels[6] = "Weka Multilayer Perceptron";
 
         VotedPerceptron wekaVoted = new VotedPerceptron();
         classifierArray.add(wekaVoted);
-        labels[6] = "Weka Voted Perceptron";
+        labels[7] = "Weka Voted Perceptron";
         
         File dir = new File("datasets");
         PrintWriter output = new PrintWriter(new File("results.csv"));
