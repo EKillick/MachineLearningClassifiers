@@ -12,7 +12,7 @@ import weka.core.Instances;
  */
 public class LinearPerceptron extends AbstractClassifier{
     
-    private int stoppingIterations;
+    private int stoppingIterations; //stopping condition if no solution
     private double weights[];
     private double learningRate;
     private double bias;
@@ -32,50 +32,17 @@ public class LinearPerceptron extends AbstractClassifier{
      * Constructor to allow setting of learning rate and stopping iterations 
      * @param l learningRate as a double
      * @param s stoppingIterations as an int
+     * @param b optional bias
      */
     public LinearPerceptron(double l, int s, double b){
         this.learningRate = l;
         this.stoppingIterations = s;
         this.bias = b;
     }
-    
-    //Accessor Methods
-    /**
-     * Sets the learning rate
-     * @param l - learning rate as a double
-     */
-    public void setLearningRate(double l){
-        this.learningRate = l;
-    }
-    
-    /**
-     * Returns the learning rate
-     * @return learning rate as a double
-     */
-    public double getLearningRate(){
-        return this.learningRate;
-    }
-    
-    /**
-     * Sets the number of iterations before stopping
-     * @param s - stopping conditions as an int
-     */
-    public void setStoppingIterations(int s){
-        this.stoppingIterations = s;
-    }
-    
-    /**
-     * Returns the number of iterations before stopping
-     * @return stopping iterations as an int
-     */
-    public int getStoppingIterations(){
-        return this.stoppingIterations;
-    }
 
     /**
      * Builds classifier from given Instance
-     * @param instances
-     * @param i of type Instance
+     * @param instances of type Instances
      * @throws Exception 
      */
     @Override
@@ -95,7 +62,9 @@ public class LinearPerceptron extends AbstractClassifier{
         }
         
         do{
-            for (int i = 0; i < instances.numInstances(); i++){
+            for (int i = 0; (i < instances.numInstances() && correctCount 
+                    < instances.numInstances()); i++){
+                System.out.println(i);
                 Instance instance = instances.get(i);
                 double calculated = classifyInstance(instance);
                 double actual = instance.classValue();
