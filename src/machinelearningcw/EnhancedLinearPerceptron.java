@@ -1,4 +1,4 @@
-package machinelearningcw;
+    package machinelearningcw;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -76,39 +76,8 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         this.useOnline = useOnline;
     }
     
-    //Accessor Methods
-    /**
-     * Sets the learning rate
-     * @param l - learning rate as a double
-     */
-    public void setLearningRate(double l){
-        this.learningRate = l;
-    }
-    
-    /**
-     * Returns the learning rate
-     * @return learning rate as a double
-     */
-    public double getLearningRate(){
-        return this.learningRate;
-    }
-    
-    /**
-     * Sets the number of iterations before stopping
-     * @param s - stopping conditions as an int
-     */
-    public void setStoppingIterations(int s){
-        this.stoppingIterations = s;
-    }
-    
-    /**
-     * Returns the number of iterations before stopping
-     * @return stopping iterations as an int
-     */
-    public int getStoppingIterations(){
-        return this.stoppingIterations;
-    }
-    
+    //Used to switch between standardisation currently
+    //Room for removal
     /**
      * @return the standardisation
      */
@@ -257,7 +226,8 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
         
         do{
             Arrays.fill(deltaWeights, 0);
-            for (int i = 0; i < instances.numInstances(); i++){
+            for (int i = 0; (i < instances.numInstances() && correctCount 
+                    < instances.numInstances()); i++){
                 Instance instance = instances.get(i);
                 double calculated = classifyInstance(instance);
                 double actual = instance.classValue();
@@ -326,7 +296,7 @@ public class EnhancedLinearPerceptron extends AbstractClassifier{
     /**
      * A method to standardise values
      * @param value
-     * @param mean
+     * @param mean 
      * @param stdDev
      * @return 
      */
