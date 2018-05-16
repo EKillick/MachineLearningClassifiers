@@ -5,14 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import weka.classifiers.Classifier;
 import weka.core.Instances;
-import weka.classifiers.functions.MultilayerPerceptron;
-import weka.classifiers.functions.VotedPerceptron;
-import java.util.Random;
 import weka.core.Instance;
 
 /**
