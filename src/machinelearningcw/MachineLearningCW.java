@@ -74,7 +74,7 @@ public class MachineLearningCW {
         String[] fileNames = dir.list();        
         for (String f : fileNames) {
             System.out.println(f);
-//            String dataset = "datasets/musk-1.arff";
+    //        String dataset = "datasets/musk-1.arff";
     //        String dataset = "test_data.arff";
             Instances loadedData = loadData("datasets/" + f);
             loadedData.setClassIndex(loadedData.numAttributes() - 1);
@@ -122,11 +122,17 @@ public class MachineLearningCW {
             sb.append('\n');
             System.out.println("==================================");
         }
+        //Writes to file
         output.write(sb.toString());
         output.close();
 
     }
     
+    /**
+     * A method to load data from a String location
+     * @param location
+     * @return 
+     */
     private static Instances loadData(String location){
         Instances returnInstance = null;
         try{
